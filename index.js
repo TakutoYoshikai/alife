@@ -150,19 +150,33 @@ function Beast(position) {
   this.power = 60;
   this.moveOrChangeDirection = function() {
     for (var step = 1; step < 10; step++) {
-      var sight = map[this.position.y + (this.direction.y * step)][this.position.y + (this.direction.x * step)];
+      var sightX = this.position.x + (this.direction.x * step);
+      var sightY = this.position.y + (this.direction.y * step);
+      if (sightX < 0 || sightX >= width || sightY < 0 || sightY >= height) {
+        break;
+      }
+      var sight = map[sightY][sightX];
       if (sight == LifeTypes.male || sight == LifeTypes.female) {
         this.move();
         return;
       }
     }
-    this.changeDirection();
+
+    var isMove = Math.floor(Math.random() * 100);
+    if (isMove > 60) {
+      this.move();
+    } else {
+      this.changeDirection();
+    }
   }
   this.move = function() {
     var x = this.position.x + this.direction.x;
     var y = this.position.y + this.direction.y;
+    if (x < 0 || x >= width || y < 0 || y >= height) {
+      return;
+    }
     if (map[y][x] == LifeTypes.male || map[y][x] == LifeTypes.female) {
-      var human = findHuman(x, y);
+      var human = findHumanAndIndex(x, y);
       if (human == null) {
         map[this.position.y][this.position.x] = LifeTypes.nothing;
         map[y][x] = LifeTypes.beast;
@@ -186,6 +200,11 @@ function Beast(position) {
         map[this.position.y][this.position.x] = LifeTypes.nothing;
         beasts.splice(beastIndex, 1);
       }
+    } else if (map[y][x] == LifeTypes.nothing || map[y][x] == LifeTypes.plant) {
+        map[this.position.y][this.position.x] = LifeTypes.nothing;
+        map[y][x] = LifeTypes.beast;
+        this.position.x = x;
+        this.position.y = y;
     }
   }
   this.changeDirection = function() {
@@ -268,7 +287,7 @@ function init() {
   for (var i = 0; i < 200; i++) {
     map.push([]);
     for (var j = 0; j < 200; j++) {
-      map[i].push(0);
+      map[i].push(LifeTypes.nothing);
     }
   }
 
@@ -289,8 +308,8 @@ function makeRandomPosition() {
 function makeSeeds() {
   var malesNum = 20;
   var femalesNum = 20;
-  var beastsNum = 5;
-  var plantsNum = 40;
+  var beastsNum = 100;
+  var plantsNum = 300;
   for (var i = 0; i < malesNum; i++) {
     var position = makeRandomPosition();  
     map[position.y][position.x] = LifeTypes.male;
@@ -307,7 +326,7 @@ function makeSeeds() {
 
   for (var i = 0; i < plantsNum; i++) {
     var position = makeRandomPosition();  
-    map[position.y][position.x] = LifeTypes.plants;
+    map[position.y][position.x] = LifeTypes.plant;
   }
 
   for (var i = 0; i < height; i++) {
@@ -328,6 +347,40 @@ function makeSeeds() {
 
 }
 
+function drawMap() {
+  context.beginPath();
+  context.fillStyle = "white";
+  context.fillRect(0, 0, 1000, 1000);
+  for (var i = 0; i < height; i++) {
+    for (var j = 0; j < width; j++) {
+      var life = map[i][j];
+      context.beginPath();
+      if (life == LifeTypes.male) {
+        context.fillStyle = "blue";
+      }
+      if (life == LifeTypes.female) {
+        context.fillStyle = "red";
+      }
+      if (life == LifeTypes.beast) {
+        context.fillStyle = "brown";
+      }
+      if (life == LifeTypes.plant) {
+        context.fillStyle = "green";
+      }
+      if (life == LifeTypes.nothing) {
+        context.fillStyle = "white";
+      }
+      context.fillRect(5 * j, 5 * i, 5, 5);
+
+    }
+  }
+}
 function update() {
+  beasts.forEach(function(beast) {
+    beast.moveOrChangeDirection();
+  });
+  drawMap();
 }
   
+init();
+setInterval(update, 500);
