@@ -52,8 +52,25 @@ function Human(gender, position) { this.gene = new Gene(); this.gender = gender;
   this.direction = makeRandomDirection();
   this.position = position;
   this.power = 50;
+  this.hp = 100;
   if (gender == Gender.female) {
     this.power = 30;
+  }
+
+  this.update = function() {
+    this.hp -= 1;
+    if (this.hp <= 0) {
+      this.die();
+      return;
+    }
+    this.moveOrChangeDirection();
+  }
+  this.die = function() {
+    map[this.position.y][this.position.x] = LifeTypes.nothing;
+    var human = findHumanAndIndex();
+    if (human != null) {
+      humen.splice(human.index, 1);
+    }
   }
 
   this.moveOrChangeDirection = function() {
@@ -63,6 +80,61 @@ function Human(gender, position) { this.gene = new Gene(); this.gender = gender;
     } else {
       this.changeDirection();
     }
+  }
+  this.move = function() {
+    var x = this.position.x + this.direction.x;
+    var y = this.position.y + this.direction.y;
+    if (x < 0 || x >= width || y < 0 || y >= height) {
+      return;
+    }
+    if (map[y][x] == LifeTypes.nothing) {
+      map[this.position.y][this.position.x] = LifeTypes.nothing;
+      this.position.x = x;
+      this.position.y = y;
+      map[y][x] = this.gender;
+      return;
+    }
+
+    if (map[y][x] == LifeTypes.plant) {
+      map[this.position.y][this.position.x] = LifeTypes.nothing;
+      this.position.x = x;
+      this.position.y = y;
+      map[y][x] = this.gender;
+      this.hp += 5;
+      return;
+    }
+
+    if ((this.gender == Gender.male && map[y][x] == LifeTypes.female) || (this.gender == Gender.female && map[y][x] == LifeTypes.male)) {
+
+      return;
+    }
+
+    if (map[y][x] == LifeTypes.beast) {
+      var beast = findBeastAndIndex(x, y);
+      if (beast == null) {
+        map[this.position.y][this.position.x] = LifeTypes.nothing;
+        map[y][x] = this.gender;
+        this.position.x = x;
+        this.position.y = y;
+        return;
+      }
+      var beastIndex = beast.index;
+      beast = beast.target;
+      if (this.power > beast.power) {
+        beast.splice(beastIndex, 1);
+        map[this.position.y][this.position.x] = LifeTypes.nothing;
+        map[y][x] = this.gender;
+        this.position.x = x;
+        this.position.y = y;
+      } else {
+        var humanIndex = humen.indexOf(this);
+        if (humanIndex == -1) {
+          return;
+        }
+        map[this.position.y][this.position.x] = LifeTypes.nothing;
+        humen.splice(humanIndex, 1);
+      }
+    }  
   }
 
   this.changeDirection = function() {
@@ -144,22 +216,97 @@ function findHumanAndIndex(x, y) {
   return null;
 }
 
+function findBeastAndIndex(x, y) {
+  for (var i = 0; i < beasts.length; i++) {
+    if (beasts[i].position.x == x && beasts[i].position.y == y) {
+      return { target: beasts[i], index: i }
+    }
+  }
+  return null;
+  
+}
+
+function around(life, targetType) {
+  var minX = Math.max(0, life.position.x - 1);
+  var maxX = Math.min(width - 1, life.position.x + 1);
+  var minY = Math.max(0, life.position.y - 1);
+  var maxY = Math.min(height - 1, life.position.y + 1);
+  for (var i = minY; i <= maxY; i++) {
+    for (var j = minX; j <= maxX; j++) {
+      if (i == life.position.y && j == life.position.x) {
+        continue;
+      }
+      if (map[i][j] == targetType) {
+        return {
+          x: j - life.position.x,
+          y: i - life.position.y
+        }
+      }
+    }
+  }
+  return null;
+}
+
+function sight(position, direction, eyeSight) {
+  var result = [];
+  if (Math.abs(direction.x) + Math.abs(direction.y) == 1) {
+    for (var step = 1; step < eyeSight; step++) {
+      if (Math.abs(direction.x) == 1) {
+        var sightX = position.x + (direction.x * step);
+        if (sightX < 0 || sightX >= width) {
+          break;
+        }
+        var sightMinY = Math.max(0, position.y - step);
+        var sightMaxY = Math.min(height - 1, position.y + step);
+        for (var y = sightMinY; y <= sightMaxY; y++) {
+          if (map[y][sightX] != LifeTypes.nothing) {
+            result.push(map[y][sightX]);
+          }
+        }
+      } else if (Math.abs(direction.y) == 1) {
+        var sightY = position.y + (direction.y * step);
+        if (sightY < 0 || sightY >= height) {
+          break;
+        }
+        var sightMinX = Math.max(0, position.x - step);
+        var sightMaxX = Math.min(width - 1, position.x + step);
+        for (var x = sightMinX; x <= sightMaxX; x++) {
+          if (map[sightY][x] != LifeTypes.nothing) {
+            result.push(map[sightY][x]);
+          }
+        }
+      }
+    }
+  } 
+  return result;
+}
+
+
 function Beast(position) {
   this.direction = makeRandomDirection();
   this.position = position;
   this.power = 60;
+  this.hp = 20;
+  this.update = function() {
+    this.moveOrChangeDirection();
+  }
+
+  this.sight = function() {
+    return sight(this.position, this.direction, 20);   
+  }
   this.moveOrChangeDirection = function() {
-    for (var step = 1; step < 10; step++) {
-      var sightX = this.position.x + (this.direction.x * step);
-      var sightY = this.position.y + (this.direction.y * step);
-      if (sightX < 0 || sightX >= width || sightY < 0 || sightY >= height) {
-        break;
-      }
-      var sight = map[sightY][sightX];
-      if (sight == LifeTypes.male || sight == LifeTypes.female) {
-        this.move();
-        return;
-      }
+    direction = around(this, LifeTypes.male);
+    if (direction != null) {
+      this.direction = direction;
+    }
+    var direction = around(this, LifeTypes.female);
+    if (direction != null) {
+      this.direction = direction;
+    }
+    var sight = this.sight()
+    if (sight.includes(LifeTypes.male) || sight.includes(LifeTypes.female)) {
+      this.move();
+      return;
     }
 
     var isMove = Math.floor(Math.random() * 100);
@@ -377,7 +524,10 @@ function drawMap() {
 }
 function update() {
   beasts.forEach(function(beast) {
-    beast.moveOrChangeDirection();
+    beast.update();
+  });
+  humen.forEach(function(human) {
+    human.update();
   });
   drawMap();
 }
