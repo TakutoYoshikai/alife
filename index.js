@@ -84,7 +84,7 @@ function Human(gender, position) {
       this.die();
       return;
     }
-    if (this.babiesInPain > 0 && Math.random() < 0.2) {
+    if (this.babiesInPain > 0 && Math.random() < 0.2 && map[this.position.y + this.direction.y][this.position.x + this.direction.x] == LifeTypes.nothing) {
       var isMale = Math.floor(Math.random() * 2);
       var baby;
       if (isMale) {
