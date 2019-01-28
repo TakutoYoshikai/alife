@@ -67,14 +67,15 @@ function Human(gender, position) {
   this.gender = gender;
   this.direction = makeRandomDirection();
   this.position = position;
-  this.power = 50;
   this.hp = 70;
   this.eyeSight = 5;
-  this.partner = null;
   this.babiesInPain = 0;
   this.age = 0;
-  if (gender == Gender.female) {
-    this.power = 30;
+  this.power = function() {
+    if (this.gender == Gender.male) {
+      return this.gene.maleGene.power;
+    }
+    return this.gene.femaleGene.power;
   }
 
   this.update = function() {
@@ -131,8 +132,6 @@ function Human(gender, position) {
     if (femaleDirection != null) {
       var female = findHumanAndIndex(this.position.x + femaleDirection.x, this.position.y + femaleDirection.y).target;
       if (!female.isChild()) {
-        female.partner = this;
-        this.partner = female;
         female.babiesInPain += Math.floor(Math.random() * 3);
         this.gene.maleGene.courage += 0.3;
       }
@@ -218,7 +217,7 @@ function Human(gender, position) {
       }
       var beastIndex = beast.index;
       beast = beast.target;
-      if ((this.gender == Gender.male && this.gene.maleGene.power > beast.power) || (this.gender == Gender.female && this.gene.femaleGene.power > beast.power)) {
+      if (this.power() > beast.power) {
         beast.splice(beastIndex, 1);
         map[this.position.y][this.position.x] = LifeTypes.nothing;
         map[y][x] = this.gender;
@@ -629,7 +628,7 @@ function update() {
     human.update();
   });
 
-  if (humen.length > 500) {
+  if (humen.length > 300) {
     for (var i = 0; i < 200; i++) {
       humen[i].die();
     }
