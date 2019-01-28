@@ -18,19 +18,33 @@ var Gender = {
 
 function Gene() {
   this.maleGene = {
-
+    courage: 1.0,
+    kindness: 0.7,
+    power: 1.0
   }
   this.femaleGene = {
-
+    guard: 0.5,
+    power: 0.5
   }
   this.sharedGene = {
-
+    sexual: 1.0,
+    survivalInstinct: 1.0,
   }
   this.conbination = function() {
     return [];
   }
 }
 
+function makeRandomGene() {
+  var gene = new Gene();
+  gene.maleGene.courage = Math.random();
+  gene.maleGene.kindness = Math.random();
+  gene.maleGene.power = Math.random() * 0.5 + 0.5;
+  gene.sharedGene.sexual = Math.random();
+  gene.femaleGene.guard = Math.random();
+  gene.maleGene.power = Math.random() * 0.3 + 0.3;
+  return gene;
+}
 function makeRandomDirection() {
   var randX = Math.floor(Math.random() * 2);
   var randY = Math.floor(Math.random() * 2);
@@ -48,19 +62,39 @@ function makeRandomDirection() {
   }
   return { x: x, y: y };
 }
-function Human(gender, position) { this.gene = new Gene(); this.gender = gender;
+function Human(gender, position) { 
+  this.gene = makeRandomGene(); 
+  this.gender = gender;
   this.direction = makeRandomDirection();
   this.position = position;
   this.power = 50;
-  this.hp = 100;
+  this.hp = 70;
+  this.eyeSight = 5;
+  this.partner = null;
+  this.babiesInPain = 0;
+  this.age = 0;
   if (gender == Gender.female) {
     this.power = 30;
   }
 
   this.update = function() {
+    this.age += 1;
     this.hp -= 1;
     if (this.hp <= 0) {
       this.die();
+      return;
+    }
+    if (this.babiesInPain > 0 && Math.random() < 0.2) {
+      var isMale = Math.floor(Math.random() * 2);
+      var baby;
+      if (isMale) {
+        baby = new Human(Gender.male, { x: this.position.x + this.direction.x, y: this.position.y + this.direction.y });
+      } else {
+        baby = new Human(Gender.female, { x: this.position.x + this.direction.x, y: this.position.y + this.direction.y });
+      }
+      humen.push(baby);
+      map[baby.position.y][baby.position.x] = baby.gender;
+      this.babiesInPain--;
       return;
     }
     this.moveOrChangeDirection();
@@ -73,7 +107,71 @@ function Human(gender, position) { this.gene = new Gene(); this.gender = gender;
     }
   }
 
+  this.sight = function() {
+    return sight(this.position, this.direction, this.eyeSight);
+  }
+
+  this.isChild = function() {
+    return this.age <= 16;
+  }
+
   this.moveOrChangeDirection = function() {
+    if (this.isChild()) {
+      var isMove = Math.floor(Math.random() * 100);
+      if (isMove > 60) {
+        this.move();
+      } else {
+        this.changeDirection();
+      }
+      return;
+    }
+    var sight = this.sight();
+    var femaleDirection = around(this, LifeTypes.female);
+
+    if (femaleDirection != null) {
+      var female = findHumanAndIndex(this.position.x + femaleDirection.x, this.position.y + femaleDirection.y).target;
+      if (!female.isChild()) {
+        female.partner = this;
+        this.partner = female;
+        female.babiesInPain += Math.floor(Math.random() * 3);
+        this.gene.maleGene.courage += 0.3;
+      }
+    }
+
+    if (this.gender == Gender.male && sight.includes(LifeTypes.female)) {
+      if (sight.includes(LifeTypes.beast) && this.gene.sharedGene.sexual < 1 - this.gene.maleGene.courage) {
+        this.direction.x *= -1;
+        this.direction.y *= -1;
+        this.move();
+        return;
+      }
+      if (Math.random() <= this.gene.sharedGene.sexual) {
+        this.move();
+        return;
+      }
+    }
+    var beastDirection = around(this, LifeTypes.beast);
+    if (this.gender == Gender.male && beastDirection != null) {
+      if (this.gene.maleGene.courage > this.gene.sharedGene.survivalInstinct) {
+        this.direction = beastDirection;
+        this.move();
+        return;
+      }
+    }
+    if (this.gender == Gender.female && sight.includes(LifeTypes.male)) {
+      if (sight.includes(LifeTypes.beast)) {
+        if (Math.random() <= this.gene.sharedGene.survivalInstinct) {
+          this.direction.x *= -1;
+          this.direction.y *= -1;
+          this.move();
+          return;
+        }
+      }
+      if (Math.random() <= this.gene.sharedGene.sexual * 0.4) {
+        this.move();
+        return;
+      }
+    }
     var isMove = Math.floor(Math.random() * 100);
     if (isMove > 60) {
       this.move();
@@ -120,7 +218,7 @@ function Human(gender, position) { this.gene = new Gene(); this.gender = gender;
       }
       var beastIndex = beast.index;
       beast = beast.target;
-      if (this.power > beast.power) {
+      if ((this.gender == Gender.male && this.gene.maleGene.power > beast.power) || (this.gender == Gender.female && this.gene.femaleGene.power > beast.power)) {
         beast.splice(beastIndex, 1);
         map[this.position.y][this.position.x] = LifeTypes.nothing;
         map[y][x] = this.gender;
@@ -453,10 +551,15 @@ function makeRandomPosition() {
   }
 }
 function makeSeeds() {
-  var malesNum = 20;
-  var femalesNum = 20;
-  var beastsNum = 100;
-  var plantsNum = 300;
+  var malesNum = 50;
+  var femalesNum = 50;
+  var beastsNum = 50;
+  var plantsNum = 2000;
+
+  for (var i = 0; i < plantsNum; i++) {
+    var position = makeRandomPosition();  
+    map[position.y][position.x] = LifeTypes.plant;
+  }
   for (var i = 0; i < malesNum; i++) {
     var position = makeRandomPosition();  
     map[position.y][position.x] = LifeTypes.male;
@@ -471,10 +574,6 @@ function makeSeeds() {
     map[position.y][position.x] = LifeTypes.beast;
   }
 
-  for (var i = 0; i < plantsNum; i++) {
-    var position = makeRandomPosition();  
-    map[position.y][position.x] = LifeTypes.plant;
-  }
 
   for (var i = 0; i < height; i++) {
     for (var j = 0; j < width; j++) {
@@ -529,6 +628,12 @@ function update() {
   humen.forEach(function(human) {
     human.update();
   });
+
+  if (humen.length > 500) {
+    for (var i = 0; i < 200; i++) {
+      humen[i].die();
+    }
+  }
   drawMap();
 }
   
