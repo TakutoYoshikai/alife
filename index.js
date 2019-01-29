@@ -155,7 +155,7 @@ function Human(gender, position) {
     var sight = this.sight();
     var femaleDirection = around(this, LifeTypes.female);
 
-    if (femaleDirection != null) {
+    if (femaleDirection != null && this.gender == Gender.male) {
       var female = findHumanAndIndex(this.position.x + femaleDirection.x, this.position.y + femaleDirection.y).target;
       if (!female.isChild() && female.babiesInPain == 0) {
         female.babiesInPain += Math.floor(Math.random() * 3);
@@ -517,7 +517,7 @@ function makeRandomPosition() {
 function makeSeeds() {
   var malesNum = 50;
   var femalesNum = 50;
-  var beastsNum = 50;
+  var beastsNum = 500;
   var plantsNum = 2000;
 
   for (var i = 0; i < plantsNum; i++) {
