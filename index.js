@@ -128,7 +128,7 @@ function Human(gender, position) {
   }
   this.die = function() {
     map[this.position.y][this.position.x] = LifeTypes.nothing;
-    var human = findHumanAndIndex();
+    var human = findHumanAndIndex(this.position.x, this.position.y);
     if (human != null) {
       humen.splice(human.index, 1);
     }
@@ -593,11 +593,6 @@ function update() {
     human.update();
   });
 
-  if (humen.length > 300) {
-    for (var i = 0; i < 200; i++) {
-      humen[i].die();
-    }
-  }
   drawMap();
 }
   
