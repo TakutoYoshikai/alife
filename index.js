@@ -242,72 +242,7 @@ function Human(gender, position) {
   }
 
   this.changeDirection = function() {
-    var isLeft = Math.floor(Math.random() * 2);
-    if (this.direction.x == -1 && this.direction.y == -1) {
-      if (isLeft) {
-        this.direction.y = 0;
-      } else {
-        this.direction.x = 0;
-      }
-      return;
-    }
-
-    if (this.direction.x == -1 && this.direction.y == 0) {
-      if (isLeft) {
-        this.direction.y = 1;
-      } else {
-        this.direction.y = -1;
-      }
-      return;
-    }
-    if (this.direction.x == -1 && this.direction.y == 1) {
-      if (isLeft) {
-        this.direction.x = 0;
-      } else {
-        this.direction.y = 0;
-      }
-      return;
-    }
-    if (this.direction.x == 0 && this.direction.y == -1) {
-      if (isLeft) {
-        this.direction.x = -1;
-      } else {
-        this.direction.x = 1;
-      }
-      return;
-    }
-    if (this.direction.x == 0 && this.direction.y == 1) {
-      if (isLeft) {
-        this.direction.x = 1;
-      } else {
-        this.direction.x = -1;
-      }
-      return;
-    }
-    if (this.direction.x == 1 && this.direction.y == -1) {
-      if (isLeft) {
-        this.direction.x = 0;
-      } else {
-        this.direction.y = 0;
-      }
-      return;
-    }
-    if (this.direction.x == 1 && this.direction.y == 0) {
-      if (isLeft) {
-        this.direction.y = -1;
-      } else {
-        this.direction.y = 1;
-      }
-      return;
-    }
-    if (this.direction.x == 1 && this.direction.y == 1) {
-      if (isLeft) {
-        this.direction.y = 0;
-      } else {
-        this.direction.x = 0;
-      }
-      return;
-    }
+    changeDirection(this);
   }
 }
 
@@ -385,6 +320,75 @@ function sight(position, direction, eyeSight) {
   return result;
 }
 
+function changeDirection(life) {
+  var isLeft = Math.floor(Math.random() * 2);
+  if (life.direction.x == -1 && life.direction.y == -1) {
+    if (isLeft) {
+      life.direction.y = 0;
+    } else {
+      life.direction.x = 0;
+    }
+    return;
+  }
+
+  if (life.direction.x == -1 && life.direction.y == 0) {
+    if (isLeft) {
+      life.direction.y = 1;
+    } else {
+      life.direction.y = -1;
+    }
+    return;
+  }
+  if (life.direction.x == -1 && life.direction.y == 1) {
+    if (isLeft) {
+      life.direction.x = 0;
+    } else {
+      life.direction.y = 0;
+    }
+    return;
+  }
+  if (life.direction.x == 0 && life.direction.y == -1) {
+    if (isLeft) {
+      life.direction.x = -1;
+    } else {
+      life.direction.x = 1;
+    }
+    return;
+  }
+  if (life.direction.x == 0 && life.direction.y == 1) {
+    if (isLeft) {
+      life.direction.x = 1;
+    } else {
+      life.direction.x = -1;
+    }
+    return;
+  }
+  if (life.direction.x == 1 && life.direction.y == -1) {
+    if (isLeft) {
+      life.direction.x = 0;
+    } else {
+      life.direction.y = 0;
+    }
+    return;
+  }
+  if (life.direction.x == 1 && life.direction.y == 0) {
+    if (isLeft) {
+      life.direction.y = -1;
+    } else {
+      life.direction.y = 1;
+    }
+    return;
+  }
+  if (life.direction.x == 1 && life.direction.y == 1) {
+    if (isLeft) {
+      life.direction.y = 0;
+    } else {
+      life.direction.x = 0;
+    }
+    return;
+  }
+}
+
 
 function Beast(position) {
   this.direction = makeRandomDirection();
@@ -459,72 +463,7 @@ function Beast(position) {
     }
   }
   this.changeDirection = function() {
-    var isLeft = Math.floor(Math.random() * 2);
-    if (this.direction.x == -1 && this.direction.y == -1) {
-      if (isLeft) {
-        this.direction.y = 0;
-      } else {
-        this.direction.x = 0;
-      }
-      return;
-    }
-
-    if (this.direction.x == -1 && this.direction.y == 0) {
-      if (isLeft) {
-        this.direction.y = 1;
-      } else {
-        this.direction.y = -1;
-      }
-      return;
-    }
-    if (this.direction.x == -1 && this.direction.y == 1) {
-      if (isLeft) {
-        this.direction.x = 0;
-      } else {
-        this.direction.y = 0;
-      }
-      return;
-    }
-    if (this.direction.x == 0 && this.direction.y == -1) {
-      if (isLeft) {
-        this.direction.x = -1;
-      } else {
-        this.direction.x = 1;
-      }
-      return;
-    }
-    if (this.direction.x == 0 && this.direction.y == 1) {
-      if (isLeft) {
-        this.direction.x = 1;
-      } else {
-        this.direction.x = -1;
-      }
-      return;
-    }
-    if (this.direction.x == 1 && this.direction.y == -1) {
-      if (isLeft) {
-        this.direction.x = 0;
-      } else {
-        this.direction.y = 0;
-      }
-      return;
-    }
-    if (this.direction.x == 1 && this.direction.y == 0) {
-      if (isLeft) {
-        this.direction.y = -1;
-      } else {
-        this.direction.y = 1;
-      }
-      return;
-    }
-    if (this.direction.x == 1 && this.direction.y == 1) {
-      if (isLeft) {
-        this.direction.y = 0;
-      } else {
-        this.direction.x = 0;
-      }
-      return;
-    }
+    changeDirection(this);
   }
 }
 
