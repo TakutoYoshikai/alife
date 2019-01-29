@@ -157,7 +157,7 @@ function Human(gender, position) {
 
     if (femaleDirection != null) {
       var female = findHumanAndIndex(this.position.x + femaleDirection.x, this.position.y + femaleDirection.y).target;
-      if (!female.isChild()) {
+      if (!female.isChild() && female.babiesInPain == 0) {
         female.babiesInPain += Math.floor(Math.random() * 3);
         this.gene.maleGene.courage += 0.3;
       }
