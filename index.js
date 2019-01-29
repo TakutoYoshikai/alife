@@ -186,11 +186,11 @@ function Human(gender, position) {
     }
   }
   this.move = function() {
-    var x = this.position.x + this.direction.x;
-    var y = this.position.y + this.direction.y;
-    if (x < 0 || x >= width || y < 0 || y >= height) {
+    if (isOutSide(this.position, this.direction)) {
       return;
     }
+    var x = this.position.x + this.direction.x;
+    var y = this.position.y + this.direction.y;
     if (map[y][x] == LifeTypes.nothing) {
       map[this.position.y][this.position.x] = LifeTypes.nothing;
       this.position.x = x;
@@ -421,11 +421,11 @@ function Beast(position) {
     }
   }
   this.move = function() {
-    var x = this.position.x + this.direction.x;
-    var y = this.position.y + this.direction.y;
-    if (x < 0 || x >= width || y < 0 || y >= height) {
+    if (isOutSide(this.position, this.direction)) {
       return;
     }
+    var x = this.position.x + this.direction.x;
+    var y = this.position.y + this.direction.y;
     if (map[y][x] == LifeTypes.male || map[y][x] == LifeTypes.female) {
       var human = findHumanAndIndex(x, y);
       if (human == null) {
