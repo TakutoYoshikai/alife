@@ -63,6 +63,25 @@ function makeRandomDirection() {
   return { x: x, y: y };
 }
 
+function countAround(life, lifeTypes) {
+  var minX = Math.max(0, life.position.x - 1);
+  var maxX = Math.min(width - 1, life.position.x + 1);
+  var minY = Math.max(0, life.position.y - 1);
+  var maxY = Math.min(height - 1, life.position.y + 1);
+  var count = 0;
+  for (var i = minY; i <= maxY; i++) {
+    for (var j = minX; j <= maxX; j++) {
+      if (i == life.position.y && j == life.position.x) {
+        continue;
+      }
+      if (lifeTypes.includes(map[i][j])) {
+        count++;
+      }
+    }
+  }
+  return count;
+  
+}
 function isOutSide(position, direction) {
   if (position.y + direction.y < 0 || position.y + direction.y >= height || position.x + direction.x < 0 || position.x + direction.x >= width) {
     return true;
@@ -88,7 +107,7 @@ function Human(gender, position) {
   this.update = function() {
     this.age += 1;
     this.hp -= 1;
-    if (this.hp <= 0) {
+    if (this.hp <= 0 || countAround(this, [LifeTypes.male, LifeTypes.female]) > 5) {
       this.die();
       return;
     }
