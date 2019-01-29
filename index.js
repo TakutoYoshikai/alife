@@ -94,6 +94,7 @@ function Human(gender, position) {
   this.direction = makeRandomDirection();
   this.position = position;
   this.hp = 70;
+    
   this.eyeSight = 5;
   this.babiesInPain = 0;
   this.age = 0;
@@ -106,7 +107,7 @@ function Human(gender, position) {
 
   this.update = function() {
     this.age += 1;
-    this.hp -= 1;
+    this.hp -= 2;
     if (this.hp <= 0 || countAround(this, [LifeTypes.male, LifeTypes.female]) > 5) {
       this.die();
       return;
@@ -223,7 +224,7 @@ function Human(gender, position) {
       this.position.x = x;
       this.position.y = y;
       map[y][x] = this.gender;
-      this.hp += 5;
+      this.hp += 50;
       return;
     }
 
@@ -517,8 +518,8 @@ function makeRandomPosition() {
 function makeSeeds() {
   var malesNum = 50;
   var femalesNum = 50;
-  var beastsNum = 500;
-  var plantsNum = 2000;
+  var beastsNum = 50;
+  var plantsNum = 5000;
 
   for (var i = 0; i < plantsNum; i++) {
     var position = makeRandomPosition();  
@@ -585,6 +586,16 @@ function drawMap() {
     }
   }
 }
+
+function plantsGrow() {
+  var plantsNum = 10;
+  for (var i = 0; i < plantsNum; i++) {
+    var position = makeRandomPosition();  
+    if (map[position.y][position.x] == LifeTypes.nothing) {
+      map[position.y][position.x] = LifeTypes.plant;
+    }
+  }
+}
 function update() {
   beasts.forEach(function(beast) {
     beast.update();
@@ -592,9 +603,21 @@ function update() {
   humen.forEach(function(human) {
     human.update();
   });
+  plantsGrow();
 
   drawMap();
 }
+
+function updateWithoutDraw() {
+  beasts.forEach(function(beast) {
+    beast.update();
+  });
+  humen.forEach(function(human) {
+    human.update();
+  });
+  plantsGrow();
+
+}
   
 init();
-setInterval(update, 500);
+var timer = setInterval(update, 500);
