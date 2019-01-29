@@ -62,6 +62,13 @@ function makeRandomDirection() {
   }
   return { x: x, y: y };
 }
+
+function isOutSide(position, direction) {
+  if (position.y + direction.y < 0 || position.y + direction.y >= height || position.x + direction.x < 0 || position.x + direction.x >= width) {
+    return true;
+  }
+  return false;
+}
 function Human(gender, position) { 
   this.gene = makeRandomGene(); 
   this.gender = gender;
@@ -85,7 +92,7 @@ function Human(gender, position) {
       this.die();
       return;
     }
-    if (this.babiesInPain > 0 && Math.random() < 0.2 && map[this.position.y + this.direction.y][this.position.x + this.direction.x] == LifeTypes.nothing) {
+    if (!isOutSide(this.position, this.direction) && this.babiesInPain > 0 && Math.random() < 0.2 && map[this.position.y + this.direction.y][this.position.x + this.direction.x] == LifeTypes.nothing) {
       var isMale = Math.floor(Math.random() * 2);
       var baby;
       if (isMale) {
