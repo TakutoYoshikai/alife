@@ -93,7 +93,7 @@ function Human(gender, position) {
   this.gender = gender;
   this.direction = makeRandomDirection();
   this.position = position;
-  this.hp = 70;
+  this.hp = 60;
     
   this.eyeSight = 5;
   this.babiesInPain = 0;
@@ -107,7 +107,7 @@ function Human(gender, position) {
 
   this.update = function() {
     this.age += 1;
-    this.hp -= 2;
+    this.hp -= 1;
     if (this.hp <= 0 || countAround(this, [LifeTypes.male, LifeTypes.female]) > 5) {
       this.die();
       return;
@@ -224,7 +224,7 @@ function Human(gender, position) {
       this.position.x = x;
       this.position.y = y;
       map[y][x] = this.gender;
-      this.hp += 50;
+      this.hp += 25;
       return;
     }
 
@@ -516,8 +516,8 @@ function makeRandomPosition() {
   }
 }
 function makeSeeds() {
-  var malesNum = 50;
-  var femalesNum = 50;
+  var malesNum = 100;
+  var femalesNum = 100;
   var beastsNum = 50;
   var plantsNum = 5000;
 
@@ -588,7 +588,7 @@ function drawMap() {
 }
 
 function plantsGrow() {
-  var plantsNum = 10;
+  var plantsNum = 1;
   for (var i = 0; i < plantsNum; i++) {
     var position = makeRandomPosition();  
     if (map[position.y][position.x] == LifeTypes.nothing) {
@@ -620,4 +620,4 @@ function updateWithoutDraw() {
 }
   
 init();
-var timer = setInterval(update, 500);
+var timer = setInterval(update, 300);
