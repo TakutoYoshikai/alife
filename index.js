@@ -39,10 +39,10 @@ function makeRandomGene() {
   var gene = new Gene();
   gene.maleGene.courage = Math.random();
   gene.maleGene.kindness = Math.random();
-  gene.maleGene.power = Math.random() * 0.5 + 0.5;
+  gene.maleGene.power = Math.random() * 0.3 + 0.5;
   gene.sharedGene.sexual = Math.random();
   gene.femaleGene.guard = Math.random();
-  gene.maleGene.power = Math.random() * 0.3 + 0.3;
+  gene.femaleGene.power = Math.random() * 0.3 + 0.3;
   return gene;
 }
 function makeRandomDirection() {
