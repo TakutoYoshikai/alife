@@ -3,6 +3,9 @@ var context = canvas.getContext("2d");
 var width = 200;
 var height = 200;
 
+var increasingPlants = 1;
+var increasingBeasts = 1;
+
 var LifeTypes = {
   nothing: 0,
   male: 1,
@@ -588,13 +591,22 @@ function drawMap() {
 }
 
 function plantsGrow() {
-  var plantsNum = 1;
-  for (var i = 0; i < plantsNum; i++) {
+  for (var i = 0; i < increasingPlants; i++) {
     var position = makeRandomPosition();  
     if (map[position.y][position.x] == LifeTypes.nothing) {
       map[position.y][position.x] = LifeTypes.plant;
     }
   }
+}
+
+function beastsIncrease() {
+  for (var i = 0; i < increasingBeasts; i++) {
+    var position = makeRandomPosition();  
+    if (map[position.y][position.x] == LifeTypes.nothing) {
+      map[position.y][position.x] = LifeTypes.beast;
+    }
+  }
+
 }
 function update() {
   beasts.forEach(function(beast) {
@@ -616,8 +628,9 @@ function updateWithoutDraw() {
     human.update();
   });
   plantsGrow();
+  beastsIncrease();
 
 }
   
 init();
-var timer = setInterval(update, 300);
+var timer = setInterval(update, 100);
